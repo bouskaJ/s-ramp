@@ -77,7 +77,12 @@ public class MavenRepositoryService extends HttpServlet {
 
     static {
         Sramp sramp = new Sramp();
-        SNAPSHOT_ALLOWED = sramp.isSnapshotAllowed();
+        String value = sramp.getConfigProperty(SrampConstants.SRAMP_SNAPSHOT_ALLOWED, "false"); //$NON-NLS-1$
+        if (StringUtils.isNotBlank(value) && value.equals("true")) { //$NON-NLS-1$
+            SNAPSHOT_ALLOWED = true;
+        } else {
+            SNAPSHOT_ALLOWED = false;
+        }
     }
 
     @Override

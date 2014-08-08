@@ -72,7 +72,6 @@ import org.overlord.sramp.client.query.ArtifactSummary;
 import org.overlord.sramp.client.query.QueryResultSet;
 import org.overlord.sramp.common.ArtifactType;
 import org.overlord.sramp.common.ArtifactTypeEnum;
-import org.overlord.sramp.common.Sramp;
 import org.overlord.sramp.common.SrampModelUtils;
 import org.overlord.sramp.integration.java.model.JavaModel;
 import org.overlord.sramp.wagon.i18n.Messages;
@@ -93,14 +92,10 @@ public class SrampWagon extends StreamWagon {
 	private transient SrampArchive archive;
 	private transient SrampAtomApiClient client;
 
-    boolean snapshot;
-
 	/**
 	 * Constructor.
 	 */
 	public SrampWagon() {
-        Sramp properties = new Sramp();
-        snapshot = properties.isSnapshotAllowed();
 	}
 
 	/**
@@ -500,10 +495,8 @@ public class SrampWagon extends StreamWagon {
 	@Override
 	public void putFromStream(InputStream stream, String destination) throws TransferFailedException,
 			ResourceDoesNotExistException, AuthorizationException {
-        if (!snapshot) {
-            Resource resource = new Resource(destination);
-            putCommon(resource, null, stream);
-        }
+		Resource resource = new Resource(destination);
+		putCommon(resource, null, stream);
 	}
 
 	/**
@@ -512,12 +505,10 @@ public class SrampWagon extends StreamWagon {
 	@Override
 	public void putFromStream(InputStream stream, String destination, long contentLength, long lastModified)
 			throws TransferFailedException, ResourceDoesNotExistException, AuthorizationException {
-        if (!snapshot) {
-            Resource resource = new Resource(destination);
-            resource.setContentLength(contentLength);
-            resource.setLastModified(lastModified);
-            putCommon(resource, null, stream);
-        }
+		Resource resource = new Resource(destination);
+		resource.setContentLength(contentLength);
+		resource.setLastModified(lastModified);
+		putCommon(resource, null, stream);
 	}
 
 	/**
@@ -526,19 +517,17 @@ public class SrampWagon extends StreamWagon {
 	@Override
 	public void put(File source, String resourceName) throws TransferFailedException,
 			ResourceDoesNotExistException, AuthorizationException {
-        if (!snapshot) {
-            InputStream resourceInputStream = null;
-            try {
-                resourceInputStream = new FileInputStream(source);
-            } catch (FileNotFoundException e) {
-                throw new TransferFailedException(e.getMessage());
-            }
+		InputStream resourceInputStream = null;
+		try {
+			resourceInputStream = new FileInputStream(source);
+		} catch (FileNotFoundException e) {
+			throw new TransferFailedException(e.getMessage());
+		}
 
-            Resource resource = new Resource(resourceName);
-            resource.setContentLength(source.length());
-            resource.setLastModified(source.lastModified());
-            putCommon(resource, source, resourceInputStream);
-        }
+		Resource resource = new Resource(resourceName);
+		resource.setContentLength(source.length());
+		resource.setLastModified(source.lastModified());
+		putCommon(resource, source, resourceInputStream);
 	}
 
 	/**
@@ -657,6 +646,7 @@ public class SrampWagon extends StreamWagon {
 	 * @throws TransferFailedException
 	 */
 	private void doPutArtifact(final MavenGavInfo gavInfo, InputStream resourceInputStream) throws TransferFailedException {
+
 		// See the comment in {@link SrampWagon#fillInputData(InputData)} about why we're doing this
 		// context classloader magic.
 		ClassLoader oldCtxCL = Thread.currentThread().getContextClassLoader();
